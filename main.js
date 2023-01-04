@@ -123,23 +123,28 @@ function showAllNotes(dataLocal = JSON.parse(localStorage.getItem("dataOnSite"))
     }
 }
 
+
 function addGotData(data) {
     let listOfNotice = document.getElementById("listOfNotice");
     listOfNotice.innerHTML = "";
+
     data.forEach((row, index) => {
+        let dataAboutSingeleNotice = JSON.stringify(row);
+        let {title, description} = row;
+
         if (row.title !== '' && row.description !== '')
         {
             listOfNotice.innerHTML += `
-                <div class="card mt-2 btn" style='background: white' onclick="openNotice(this)" data-singleNotice = '${JSON.stringify(row)}'>
+                <div class="card mt-2 btn" style='background: white' onclick="openNotice(this)" data-singleNotice = '${dataAboutSingeleNotice}'>
                     <div class="card-body">
                         <div style='display: flex; justify-content: space-between'>
-                            <h5 class = "card-title" style = "overflow: hidden; text-overflow: ellipsis; height: 1.5em; white-space: nowrap"> ${row.title} </h5>
+                            <h5 class = "card-title" style = "overflow: hidden; text-overflow: ellipsis; height: 1.5em; white-space: nowrap"> ${title} </h5>
                             <div>
-                                <button type="button" class="btn btn-icon" onclick="editNoticeFunction(this)" data-id='${index}' data-singleNotice = '${JSON.stringify(row)}'><span class='pen me-1'></span></button>
-                                <button type="button" class="btn btn-icon" onclick="deleteNoticeFunction(this)" data-title='${row.title}'><span class='trash me-1'></span></button>
+                                <button type="button" class="btn btn-icon" onclick="editNoticeFunction(this)" data-id='${index}' data-singleNotice = '${dataAboutSingeleNotice}'><span class='pen me-1'></span></button>
+                                <button type="button" class="btn btn-icon" onclick="deleteNoticeFunction(this)" data-title='${title}'><span class='trash me-1'></span></button>
                             </div>
                         </div>
-                        <div class="card-text" style="overflow: hidden; max-height: 1.5em"> ${row.description} </div>
+                        <div class="card-text" style="overflow: hidden; max-height: 1.5em"> ${description} </div>
                     </div>
                 </div>
             `;
@@ -147,18 +152,20 @@ function addGotData(data) {
     })
 }
 
+
 function openNotice(object) {
     let singleNotice = document.getElementById("singleNotice");
-    let singleNoticeObj = JSON.parse(object.getAttribute("data-singleNotice"));
+    let {title, dateTime, description, attached} = JSON.parse(object.getAttribute("data-singleNotice"));
+    attached = attached.split(/\/view|\/edit/)[0];
 
     singleNotice.innerHTML = `
         <div class="card mt-2" style='position: relative; height: 100vh'>
             <div class="card-body">
-                <h5 class="card-title"> ${singleNoticeObj.title} </h5>
-                <h6 class="card-subtitle mb-2 text-muted"> ${singleNoticeObj.dateTime} </h6>
-                <div class="card-text mb-3 "> ${singleNoticeObj.description} </div>
+                <h5 class="card-title"> ${title} </h5>
+                <h6 class="card-subtitle mb-2 text-muted"> ${dateTime} </h6>
+                <div class="card-text mb-3 "> ${description} </div>
                 <div class="card-text" style='height: 80%; max-height: 80%'>
-                    <iframe src='${singleNoticeObj.attached.split(/\/view|\/edit/)[0]}/preview' allow="autoplay" width='100%' height='100%'></iframe>
+                    <iframe src='${attached}/preview' allow="autoplay" width='100%' height='100%'></iframe>
                 </div>
             </div>
         </div>
@@ -170,29 +177,29 @@ function editNoticeFunction(object) {
 
     localStorage.setItem("index", object.getAttribute("data-id"));
     let singleNotice = document.getElementById("singleNotice");
-    let singleNoticeObj = JSON.parse(object.getAttribute("data-singleNotice"));
+    let {title, dateTime, description, attached} = JSON.parse(object.getAttribute("data-singleNotice"));
 
     singleNotice.innerHTML = `
         <div id="contactForm" class="ms-3 me-3">
-            <input type="text" class="form-control collapse" id="oldTitle" aria-describedby="emailHelp" value='${singleNoticeObj.title}' required>
+            <input type="text" class="form-control collapse" id="oldTitle" aria-describedby="emailHelp" value='${title}' required>
             <div class="mb-2">
                 <label for="title" class="form-label">Title<sup>*</sup></label>
-                <input type="text" class="form-control" id="title" aria-describedby="emailHelp" value='${singleNoticeObj.title}' required>
+                <input type="text" class="form-control" id="title" aria-describedby="emailHelp" value='${title}' required>
                 <div id="emptyTitle" class="invalid-feedback collapse">
                     This field is required.
                 </div>
             </div>
             <div class="mb-2">
                 <label for="dateTime" class="form-label">Date Time</label>
-                <input type="text" class="form-control" id="dateTime" aria-describedby="emailHelp" value='${singleNoticeObj.dateTime}'>
+                <input type="text" class="form-control" id="dateTime" aria-describedby="emailHelp" value='${dateTime}'>
             </div>
             <div class="mb-2">
                 <label for="description" class="form-label">Description</label>
-                <input type="text" class="form-control" id="description" aria-describedby="emailHelp" value='${singleNoticeObj.description}'>
+                <input type="text" class="form-control" id="description" aria-describedby="emailHelp" value='${description}'>
             </div>
             <div class="mb-2">
                 <label for="attached">Choose file to attach:</label>
-                <input type="text" class="form-control" id="attached" aria-describedby="emailHelp" value='${singleNoticeObj.attached}'>
+                <input type="text" class="form-control" id="attached" aria-describedby="emailHelp" value='${attached}'>
             </div>
             <button type="submit" class="btn btn-outline-dark bg-white text-dark" id="btnSubmit" onclick="SubmitBtn()">Submit</button>
             <button type="submit" class="btn btn-outline-dark bg-white text-dark" id="btnCancel" onclick="CancelBtn()">Cancel</button>
